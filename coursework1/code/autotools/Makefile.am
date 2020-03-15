@@ -1,3 +1,3 @@
-AUTOMARK_OPTIONS = foreign
-bin_PROGRAMS = hello
-helo_SOURCES = hello.c sum.h sum.c
+AUTOMAKE_OPTIONS = foreign
+bin_PROGRAMS = program
+program_SOURCES = hello.c

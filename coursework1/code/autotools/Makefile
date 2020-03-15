@@ -70,10 +70,10 @@ am__make_running_with_option = \
   test $$has_opt = yes
 am__make_dryrun = (target_option=n; $(am__make_running_with_option))
 am__make_keepgoing = (target_option=k; $(am__make_running_with_option))
-pkgdatadir = $(datadir)/hello
-pkgincludedir = $(includedir)/hello
-pkglibdir = $(libdir)/hello
-pkglibexecdir = $(libexecdir)/hello
+pkgdatadir = $(datadir)/program
+pkgincludedir = $(includedir)/program
+pkglibdir = $(libdir)/program
+pkglibexecdir = $(libexecdir)/program
 am__cd = CDPATH="$${ZSH_VERSION+.}$(PATH_SEPARATOR)" && cd
 install_sh_DATA = $(install_sh) -c -m 644
 install_sh_PROGRAM = $(install_sh) -c
@@ -86,7 +86,7 @@ POST_INSTALL = :
 NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
-bin_PROGRAMS = hello$(EXEEXT)
+bin_PROGRAMS = program$(EXEEXT)
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.ac
@@ -102,9 +102,9 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
-hello_SOURCES = hello.c
-hello_OBJECTS = hello.$(OBJEXT)
-hello_LDADD = $(LDADD)
+am_program_OBJECTS = hello.$(OBJEXT)
+program_OBJECTS = $(am_program_OBJECTS)
+program_LDADD = $(LDADD)
 AM_V_P = $(am__v_P_$(V))
 am__v_P_ = $(am__v_P_$(AM_DEFAULT_VERBOSITY))
 am__v_P_0 = false
@@ -133,8 +133,8 @@ AM_V_CCLD = $(am__v_CCLD_$(V))
 am__v_CCLD_ = $(am__v_CCLD_$(AM_DEFAULT_VERBOSITY))
 am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
-SOURCES = hello.c
-DIST_SOURCES = hello.c
+SOURCES = $(program_SOURCES)
+DIST_SOURCES = $(program_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -163,8 +163,7 @@ CTAGS = ctags
 CSCOPE = cscope
 AM_RECURSIVE_TARGETS = cscope
 am__DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/config.h.in AUTHORS \
-	COPYING ChangeLog INSTALL NEWS README compile depcomp \
-	install-sh missing
+	ChangeLog NEWS README compile depcomp install-sh missing
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 distdir = $(PACKAGE)-$(VERSION)
 top_distdir = $(distdir)
@@ -212,11 +211,11 @@ LTLIBOBJS =
 MAKEINFO = ${SHELL} /home/LP/coursework/autotools/missing makeinfo
 MKDIR_P = /bin/mkdir -p
 OBJEXT = o
-PACKAGE = hello
+PACKAGE = program
 PACKAGE_BUGREPORT = 
-PACKAGE_NAME = hello
-PACKAGE_STRING = hello 1.0
-PACKAGE_TARNAME = hello
+PACKAGE_NAME = program
+PACKAGE_STRING = program 1.0
+PACKAGE_TARNAME = program
 PACKAGE_URL = 
 PACKAGE_VERSION = 1.0
 PATH_SEPARATOR = :
@@ -267,8 +266,8 @@ target_alias =
 top_build_prefix = 
 top_builddir = .
 top_srcdir = .
-AUTOMARK_OPTIONS = foreign
-helo_SOURCES = hello.c sum.h sum.c
+AUTOMAKE_OPTIONS = foreign
+program_SOURCES = hello.c
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-am
 
@@ -280,15 +279,15 @@ $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
 	    *$$dep*) \
-	      echo ' cd $(srcdir) && $(AUTOMAKE) --gnu'; \
-	      $(am__cd) $(srcdir) && $(AUTOMAKE) --gnu \
+	      echo ' cd $(srcdir) && $(AUTOMAKE) --foreign'; \
+	      $(am__cd) $(srcdir) && $(AUTOMAKE) --foreign \
 		&& exit 0; \
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --gnu Makefile
+	  $(AUTOMAKE) --foreign Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
 	  *config.status*) \
@@ -365,9 +364,9 @@ uninstall-binPROGRAMS:
 clean-binPROGRAMS:
 	-test -z "$(bin_PROGRAMS)" || rm -f $(bin_PROGRAMS)
 
-hello$(EXEEXT): $(hello_OBJECTS) $(hello_DEPENDENCIES) $(EXTRA_hello_DEPENDENCIES) 
-	@rm -f hello$(EXEEXT)
-	$(AM_V_CCLD)$(LINK) $(hello_OBJECTS) $(hello_LDADD) $(LIBS)
+program$(EXEEXT): $(program_OBJECTS) $(program_DEPENDENCIES) $(EXTRA_program_DEPENDENCIES) 
+	@rm -f program$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(program_OBJECTS) $(program_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
