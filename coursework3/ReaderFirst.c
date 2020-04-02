@@ -1,7 +1,3 @@
-/*
-*  多线程,读者优先
-*/
-
 #include "stdio.h"
 #include <stdlib.h>
 #include <pthread.h>
@@ -12,6 +8,7 @@
 #define N_READER 6 //读者数目
 #define W_SLEEP  1 //控制写频率
 #define R_SLEEP  1 //控制读频率
+#define M_SLEEP  20 //主程序等待时间
 
 
 pthread_t wid[N_WRITER],rid[N_READER];
@@ -83,6 +80,6 @@ int main()
     {
         pthread_create(&rid[i],NULL,reader,NULL);
     }
-    sleep(20);
+    sleep(M_SLEEP);
     return 0;
 }
