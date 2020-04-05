@@ -33,13 +33,13 @@ void *writerOfRF(void* in)
 {
 	while(1)
 	{
-		pthread_mutex_lock(&mutex_write);
 		WriterCount++;
 		printf("写线程id %d 进入程序\n当前等待读者数为%d，当前等待写者数为%d\n\n",pthread_self(),ReaderCount,WriterCount);
+		pthread_mutex_lock(&mutex_write);
 		Write();
+		pthread_mutex_unlock(&mutex_write);
 		printf("写线程id %d 退出程序\n\n",pthread_self());
 		WriterCount--;
-		pthread_mutex_unlock(&mutex_write);
 		sleep(W_sleep);
 	}
 	pthread_exit((void*)0);
