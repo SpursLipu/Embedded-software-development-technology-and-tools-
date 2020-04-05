@@ -14,14 +14,14 @@ pthread_mutex_t mutex_write;//写者互斥锁
 sem_t sem_readercount;//信号量控制只有一个线程可以对读者计数器操作
 sem_t sem_writercount;//信号量控制只有一个线程可以对写者计数器操作
 //写操作函数
-void write()
+void Write()
 {
 	int temp=rand();
 	printf("写入数据 %d\n",temp);
 	SharedData=temp;
 }
 //读操作函数
-void read()
+void Read()
 {
 	printf("读到数据 %d\n",SharedData);
 }
@@ -31,9 +31,12 @@ void *writerOfRF(void* in)
 	while(1)
 	{
 		pthread_mutex_lock(&mutex_write);
+		WriterCount++;
 		printf("写线程id %d 进入数据集\n",pthread_self());
-		write();
+		printf("当前读者数为%d，当前写者数为%d\n",ReaderCount,WriterCount);
+		Write();
 		printf("写线程id %d 退出数据集\n",pthread_self());
+		WriterCount--;
 		pthread_mutex_unlock(&mutex_write);
 		sleep(W_sleep);
 	}
@@ -46,14 +49,17 @@ void *readerOfRF(void* in)
 	{
 		sem_wait(&sem_readercount);
 		ReaderCount++;
-		if(ReaderCount>0)
+		printf("读线程id %d 进入数据集\n",pthread_self());
+		printf("当前读者数为%d，当前写者数为%d\n",ReaderCount,WriterCount);
+		if(ReaderCount == 0)
 			pthread_mutex_lock(&mutex_write);
 		sem_post(&sem_readercount);
-		printf("读线程id %d 进入数据集\n",pthread_self());
-		read();
-		printf("读线程id %d 退出数据集\n",pthread_self());
+		
+		Read();
+		
 		sem_wait(&sem_readercount);
 		ReaderCount--;
+		printf("读线程id %d 退出数据集\n",pthread_self());
 		if(ReaderCount==0)
 			pthread_mutex_unlock(&mutex_write);
 		sem_post(&sem_readercount);
@@ -71,7 +77,8 @@ void *writerOfWF(void* in)
 		//sem_post(&sem_writercount);
 		pthread_mutex_lock(&mutex_write);
 		printf("写线程id %d 进入数据集\n",pthread_self());
-		write();
+		printf("当前读者数为%d，当前写者数为%d\n",ReaderCount,WriterCount);
+		Write();
 		printf("写线程id %d 退出数据集\n",pthread_self());
 		pthread_mutex_unlock(&mutex_write);
 		//sem_wait(&sem_writercount);
@@ -90,11 +97,12 @@ void *readerOfWF(void* in)
 		{
 			sem_wait(&sem_readercount);
 			ReaderCount++;
-			if(ReaderCount>0)
+			if(ReaderCount == 0)
 				pthread_mutex_lock(&mutex_write);
 			sem_post(&sem_readercount);
 			printf("读线程id %d 进入数据集\n",pthread_self());
-			read();
+			printf("当前读者数为%d，当前写者数为%d\n",ReaderCount,WriterCount);
+			Read();
 			printf("读线程id %d 退出数据集\n",pthread_self());
 			sem_wait(&sem_readercount);
 			ReaderCount--;
@@ -126,10 +134,6 @@ int main()
 		for(i=0;i<readernum;i++)
 			pthread_create(&rid[i],NULL,readerOfRF,NULL);
 		sleep(20);
-		for(i=0;i<writernum;i++)
-			pthread_join(wid[i],NULL);
-		for(i=0;i<readernum;i++)
-			pthread_join(rid[i],NULL);
 	}
 	else if(choice==1)
 	{
@@ -139,10 +143,6 @@ int main()
 		for(i=0;i<readernum;i++)
 			pthread_create(&rid[i],NULL,readerOfWF,NULL);
 		sleep(20);
-		for(i=0;i<writernum;i++)
-			pthread_join(wid[i],NULL);
-		for(i=0;i<readernum;i++)
-			pthread_join(rid[i],NULL);
 	}else{printf("没有这个选项！\n");}
 	return 0;
 }
