@@ -78,14 +78,15 @@ void *writerOfWF(void* in)
 		WriterCount++;
 		printf("写线程id %d 进入程序\n",pthread_self());
 		printf("当前等待读者数为%d，当前等待写者数为%d\n",ReaderCount,WriterCount);
-		if(WriterCount == 1)
-			pthread_mutex_lock(&mutex_read);
 
 		pthread_mutex_lock(&mutex_write);
 		Write();
 		pthread_mutex_unlock(&mutex_write);
 		
 		WriterCount--;
+		if(WriterCount == 0)
+			pthread_mutex_lock(&mutex_read);
+		
 		printf("写线程id %d 退出程序\n",pthread_self());
 		sleep(W_sleep);
 	}
@@ -101,16 +102,10 @@ void *readerOfWF(void* in)
 		printf("读线程id %d 进入程序\n",pthread_self());
 		printf("当前等待读者数为%d，当前等待写者数为%d\n",ReaderCount,WriterCount);
 		sem_post(&sem_readercount);
-		while(1)
-		{
-			if(WriterCount == 0)
-			{
-				pthread_mutex_unlock(&mutex_read);
-				break;
-			}
-		}
+
+		pthread_mutex_unlock(&mutex_read);
 		Read();
-		
+
 		sem_wait(&sem_readercount);
 		ReaderCount--;
 		printf("读线程id %d 退出程序\n",pthread_self());
