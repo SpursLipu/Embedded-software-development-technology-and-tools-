@@ -11,6 +11,9 @@ int ReaderCount=0;//读者计数器
 int WriterCount=0;//写者计数器
 int SharedData=0;//读者-写着共享数据
 pthread_mutex_t mutex_write;//写者互斥锁
+pthread_mutex_t mutex_read;//读者互斥锁
+pthread_mutex_t mutex_write_count;//写者互斥锁
+pthread_mutex_t mutex_read_count;//读者互斥锁
 sem_t sem_readercount;//信号量控制只有一个线程可以对读者计数器操作
 sem_t sem_writercount;//信号量控制只有一个线程可以对写者计数器操作
 //写操作函数
@@ -32,10 +35,10 @@ void *writerOfRF(void* in)
 	{
 		pthread_mutex_lock(&mutex_write);
 		WriterCount++;
-		printf("写线程id %d 进入数据集\n",pthread_self());
-		printf("当前读者数为%d，当前写者数为%d\n",ReaderCount,WriterCount);
+		printf("写线程id %d 进入程序\n",pthread_self());
+		printf("当前等待读者数为%d，当前等待写者数为%d\n",ReaderCount,WriterCount);
 		Write();
-		printf("写线程id %d 退出数据集\n",pthread_self());
+		printf("写线程id %d 退出程序\n",pthread_self());
 		WriterCount--;
 		pthread_mutex_unlock(&mutex_write);
 		sleep(W_sleep);
@@ -49,18 +52,18 @@ void *readerOfRF(void* in)
 	{
 		sem_wait(&sem_readercount);
 		ReaderCount++;
-		printf("读线程id %d 进入数据集\n",pthread_self());
-		printf("当前读者数为%d，当前写者数为%d\n",ReaderCount,WriterCount);
-		if(ReaderCount == 0)
+		printf("读线程id %d 进入程序\n",pthread_self());
+		printf("当前等待读者数为%d，当前等待写者数为%d\n",ReaderCount,WriterCount);
+		if(ReaderCount == 1)
 			pthread_mutex_lock(&mutex_write);
 		sem_post(&sem_readercount);
-		
+
 		Read();
-		
+
 		sem_wait(&sem_readercount);
 		ReaderCount--;
-		printf("读线程id %d 退出数据集\n",pthread_self());
-		if(ReaderCount==0)
+		printf("读线程id %d 退出程序\n",pthread_self());
+		if(ReaderCount == 0)
 			pthread_mutex_unlock(&mutex_write);
 		sem_post(&sem_readercount);
 		sleep(R_sleep);
@@ -72,18 +75,18 @@ void *writerOfWF(void* in)
 {
 	while(1)
 	{
-		sem_wait(&sem_writercount);
 		WriterCount++;
-		//sem_post(&sem_writercount);
+		printf("写线程id %d 进入程序\n",pthread_self());
+		printf("当前等待读者数为%d，当前等待写者数为%d\n",ReaderCount,WriterCount);
+		if(WriterCount == 1)
+			pthread_mutex_lock(&mutex_read);
+
 		pthread_mutex_lock(&mutex_write);
-		printf("写线程id %d 进入数据集\n",pthread_self());
-		printf("当前读者数为%d，当前写者数为%d\n",ReaderCount,WriterCount);
 		Write();
-		printf("写线程id %d 退出数据集\n",pthread_self());
 		pthread_mutex_unlock(&mutex_write);
-		//sem_wait(&sem_writercount);
+		
 		WriterCount--;
-		sem_post(&sem_writercount);
+		printf("写线程id %d 退出程序\n",pthread_self());
 		sleep(W_sleep);
 	}
 	pthread_exit((void*)0);
@@ -93,24 +96,26 @@ void *readerOfWF(void* in)
 {
 	while(1)
 	{
-		if(WriterCount==0)
+		sem_wait(&sem_readercount);
+		ReaderCount++;
+		printf("读线程id %d 进入程序\n",pthread_self());
+		printf("当前等待读者数为%d，当前等待写者数为%d\n",ReaderCount,WriterCount);
+		sem_post(&sem_readercount);
+		while(1)
 		{
-			sem_wait(&sem_readercount);
-			ReaderCount++;
-			if(ReaderCount == 0)
-				pthread_mutex_lock(&mutex_write);
-			sem_post(&sem_readercount);
-			printf("读线程id %d 进入数据集\n",pthread_self());
-			printf("当前读者数为%d，当前写者数为%d\n",ReaderCount,WriterCount);
-			Read();
-			printf("读线程id %d 退出数据集\n",pthread_self());
-			sem_wait(&sem_readercount);
-			ReaderCount--;
-			if(ReaderCount==0)
-				pthread_mutex_unlock(&mutex_write);
-			sem_post(&sem_readercount);
-			sleep(R_sleep);
+			if(WriterCount == 0)
+			{
+				pthread_mutex_unlock(&mutex_read);
+				break;
+			}
 		}
+		Read();
+		
+		sem_wait(&sem_readercount);
+		ReaderCount--;
+		printf("读线程id %d 退出程序\n",pthread_self());
+		sem_post(&sem_readercount);
+		sleep(R_sleep);
 	}
 	pthread_exit((void*)0);
 }
