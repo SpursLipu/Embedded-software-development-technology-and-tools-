@@ -86,12 +86,12 @@ void *writerOfWF(void* in)
 		WriterCount--;
 		if(WriterCount == 0)
 			pthread_mutex_lock(&mutex_read);
-		
 		printf("写线程id %d 退出程序\n",pthread_self());
 		sleep(W_sleep);
 	}
 	pthread_exit((void*)0);
 }
+
 //写者优先时的读者控制函数
 void *readerOfWF(void* in)
 {
